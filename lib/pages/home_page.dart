@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:flutter_trip/dao/home_dao.dart';
+import 'package:flutter_trip/model/home_model.dart';
+import 'dart:convert';
 
 const APPBAR_SCROLL_OFFSET = 100;
 
@@ -16,6 +19,21 @@ class _HomePageState extends State<HomePage> {
   ];
 
   double _appBarAlpha = 0;
+  String resultString = "";
+
+  loadData() {
+    HomeDao.fetch().then((value) {
+      setState(() {
+       print("sssss-->"+value.config.searchUrl);
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +60,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     Container(
                       height: 800,
-                      child: Text("ssss"),
+                      child: Text(resultString),
                     ),
                   ],
                 ))),
