@@ -19,6 +19,8 @@ class _TabNavigatorState extends State<TabNavigator> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: PageView(
+        //设置PageView禁左右滑动
+        physics: NeverScrollableScrollPhysics(),
         controller: _controller,
         children: <Widget>[
           HomePage(),
@@ -31,7 +33,6 @@ class _TabNavigatorState extends State<TabNavigator> {
           type: BottomNavigationBarType.fixed,
           currentIndex: _currentIndex,
           onTap: (index) {
-            print(index);
             _controller.jumpToPage(index);
             setState(() {
               _currentIndex = index;

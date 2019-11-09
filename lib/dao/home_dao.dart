@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_trip/model/home_model.dart';
@@ -19,12 +18,10 @@ class HomeDao {
 //    }
 
     Dio dio = new Dio();
-    final response = await dio.get(HOME_URL,
-        options: Options(responseType: ResponseType.plain));
+    final response = await dio.get(HOME_URL);
     print("首页大接口：" + response.data.toString());
     if (response.statusCode == 200) {
-      var result = json.decode(response.data.toString());
-      return HomeModel.fromJson(result);
+      return HomeModel.fromJson(response.data);
     } else {
       throw Exception("Fail to load home_page.json");
     }
