@@ -3,9 +3,12 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:flutter_trip/dao/home_dao.dart';
 import 'package:flutter_trip/model/common_model.dart';
 import 'package:flutter_trip/model/grid_nav_model.dart';
+import 'package:flutter_trip/model/sales_box_model.dart';
 import 'package:flutter_trip/widget/grid_nav.dart';
 
 import 'package:flutter_trip/widget/local_nav.dart';
+import 'package:flutter_trip/widget/sales_box.dart';
+import 'package:flutter_trip/widget/sub_nav.dart';
 
 const APPBAR_SCROLL_OFFSET = 100;
 
@@ -26,6 +29,12 @@ class _HomePageState extends State<HomePage> {
   //网格导航数据
   GridNavModel gridNavModel;
 
+  //子网格导航
+  List<CommonModel> subNavData = [];
+
+  //销售格子
+  SalesBoxModel salesBoxData;
+
   void loadData() {
     HomeDao.fetch().then((homeModel) {
       setState(() {
@@ -35,6 +44,10 @@ class _HomePageState extends State<HomePage> {
         localNavData = homeModel.localNavList;
         //网格导航数据
         gridNavModel = homeModel.gridNav;
+        //子网格导航数据
+        subNavData = homeModel.subNavList;
+        //销售格子数据
+        salesBoxData = homeModel.salesBox;
       });
     });
   }
@@ -67,6 +80,8 @@ class _HomePageState extends State<HomePage> {
                     _createBanner(),
                     _createLocalNav(),
                     _createGridNav(),
+                    _createSubNav(),
+                    _createSalesBox(),
                   ],
                 ))),
         _createAppBar(),
@@ -95,17 +110,68 @@ class _HomePageState extends State<HomePage> {
 
   ///appBar
   Widget _createAppBar() {
-    return Opacity(
-      opacity: _appBarAlpha,
-      child: Container(
-        height: 80,
-        decoration: BoxDecoration(color: Colors.white),
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.only(top: 20),
-            child: Text("首页"),
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.only(top: 35, bottom: 9, left: 8),
+            decoration: BoxDecoration(
+                color: Color.fromARGB(
+                    (_appBarAlpha * 255).toInt(), 255, 255, 255)),
+            child: Row(
+              children: <Widget>[
+                Text(
+                  "西安市",
+                  style: TextStyle(
+                      fontSize: 14,
+                      color:
+                          _appBarAlpha < 0.2 ? Colors.white : Colors.black54),
+                ),
+                Icon(Icons.expand_more,
+                    size: 22,
+                    color: _appBarAlpha < 0.2 ? Colors.white : Colors.black54),
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    height: 33,
+                    padding: EdgeInsets.only(left: 10, right: 10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        color: Color(0xFFececec)),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.search,
+                          color: Colors.blue,
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text("网红打卡地 景点 酒店 美食"),
+                        ),
+                        Icon(
+                          Icons.keyboard_voice,
+                          color: Color(0xFF969696),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(left: 7, right: 7),
+                  child: Icon(Icons.message,
+                      color:
+                          _appBarAlpha < 0.2 ? Colors.white : Colors.black54),
+                ),
+              ],
+            ),
           ),
-        ),
+          //底部小阴影
+          Container(
+            height: _appBarAlpha < 0.2 ? 0 : 0.5,
+            decoration: BoxDecoration(
+                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 0.5)]),
+          )
+        ],
       ),
     );
   }
@@ -116,9 +182,24 @@ class _HomePageState extends State<HomePage> {
   }
 
   ///网格导航
-  Widget _createGridNav()
-  {
-    return GridNav(gridNavModel: gridNavModel,);
+  Widget _createGridNav() {
+    return GridNav(
+      gridNavModel: gridNavModel,
+    );
+  }
+
+  ///子网格导航
+  Widget _createSubNav() {
+    return SubNav(
+      subNavData: subNavData,
+    );
+  }
+
+  //销售格子
+  Widget _createSalesBox() {
+    return SalesBox(
+      salesBoxData: salesBoxData,
+    );
   }
 
   void _onScroll(double offset) {
