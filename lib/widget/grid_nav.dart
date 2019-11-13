@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_trip/model/common_model.dart';
 import 'package:flutter_trip/model/grid_nav_model.dart';
+import 'package:flutter_trip/widget/web_view.dart';
 
 ///网格导航
 class GridNav extends StatelessWidget {
@@ -13,16 +15,17 @@ class GridNav extends StatelessWidget {
       margin: EdgeInsets.only(left: 7, right: 7),
       child: Column(
         children: <Widget>[
-          _createRow(gridNavModel.hotel, 0),
-          _createRow(gridNavModel.flight, 1),
-          _createRow(gridNavModel.travel, 2),
+          _createRow(context, gridNavModel.hotel, 0),
+          _createRow(context, gridNavModel.flight, 1),
+          _createRow(context, gridNavModel.travel, 2),
         ],
       ),
     );
   }
 
   ///生成一行的Widget
-  Container _createRow(GridNavItem gridNavItem, int index) {
+  Container _createRow(
+      BuildContext context, GridNavItem gridNavItem, int index) {
     Color startColor = Color(int.parse('0xff${gridNavItem.startColor}'));
     Color endColor = Color(int.parse('0xff${gridNavItem.endColor}'));
     BorderRadius borderRadius = BorderRadius.all(Radius.circular(0));
@@ -53,9 +56,8 @@ class GridNav extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
-              _createLeftMainItem(
-                  gridNavItem.mainItem.title, gridNavItem.mainItem.icon),
-              _createRight(gridNavItem),
+              _createLeftMainItem(context, gridNavItem.mainItem),
+              _createRight(context, gridNavItem),
             ],
           )
         ],
@@ -64,32 +66,47 @@ class GridNav extends StatelessWidget {
   }
 
   ///生成左边的大Item
-  Widget _createLeftMainItem(String text, String imgUrl) {
-    return Container(
-      height: 88,
-      width: 121,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(top: 12),
-            child: Text(
-              text,
-              style: TextStyle(color: Colors.white),
+  Widget _createLeftMainItem(BuildContext context, CommonModel model) {
+    String text = model.title;
+    String imgUrl = model.icon;
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => WebView(
+                      url: model.url,
+                      statusBarColor: model.statusBarColor,
+                      hideAppBar: model.hideAppBar,
+                      title: model.title,
+                    )));
+      },
+      child: Container(
+        height: 88,
+        width: 121,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(top: 12),
+              child: Text(
+                text,
+                style: TextStyle(color: Colors.white),
+              ),
             ),
-          ),
-          Image.network(
-            imgUrl,
-            fit: BoxFit.fill,
-            height: 58,
-          )
-        ],
+            Image.network(
+              imgUrl,
+              fit: BoxFit.fill,
+              height: 58,
+            )
+          ],
+        ),
       ),
     );
   }
 
   //生成右边的2行
-  Widget _createRight(GridNavItem gridNavItem) {
+  Widget _createRight(BuildContext context, GridNavItem gridNavItem) {
     return Expanded(
       flex: 1,
       child: Container(
@@ -98,14 +115,14 @@ class GridNav extends StatelessWidget {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  _createItem(true, gridNavItem.item1.title),
-                  _createItem(true, gridNavItem.item2.title),
+                  _createItem(context, true, gridNavItem.item1),
+                  _createItem(context, true, gridNavItem.item2),
                 ],
               ),
               Row(
                 children: <Widget>[
-                  _createItem(false, gridNavItem.item3.title),
-                  _createItem(false, gridNavItem.item4.title),
+                  _createItem(context, false, gridNavItem.item3),
+                  _createItem(context, false, gridNavItem.item4),
                 ],
               ),
             ],
@@ -114,7 +131,8 @@ class GridNav extends StatelessWidget {
   }
 
   //生成右边的单个的Item
-  Expanded _createItem(bool isTop, String text) {
+  Widget _createItem(BuildContext context, bool isTop, CommonModel model) {
+    String text = model.title;
     var border1w = BorderSide(width: 0.5, color: Colors.white);
     var border2w = BorderSide(width: 1, color: Colors.white);
 
@@ -125,13 +143,26 @@ class GridNav extends StatelessWidget {
 
     return Expanded(
       flex: 1,
-      child: Container(
-        decoration: isTop ? box2Top : box2Bottom,
-        height: 44,
-        alignment: Alignment.center,
-        child: Text(
-          text,
-          style: TextStyle(color: Colors.white),
+      child: InkWell(
+        onTap: (){
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => WebView(
+                    url: model.url,
+                    statusBarColor: model.statusBarColor,
+                    hideAppBar: model.hideAppBar,
+                    title: model.title,
+                  )));
+        },
+        child: Container(
+          decoration: isTop ? box2Top : box2Bottom,
+          height: 44,
+          alignment: Alignment.center,
+          child: Text(
+            text,
+            style: TextStyle(color: Colors.white),
+          ),
         ),
       ),
     );

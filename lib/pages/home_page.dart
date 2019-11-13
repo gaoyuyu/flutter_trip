@@ -3,8 +3,10 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:flutter_trip/dao/home_dao.dart';
 import 'package:flutter_trip/model/common_model.dart';
 import 'package:flutter_trip/model/grid_nav_model.dart';
+import 'package:flutter_trip/model/home_model.dart';
 import 'package:flutter_trip/model/sales_box_model.dart';
 import 'package:flutter_trip/widget/grid_nav.dart';
+import 'package:flutter_trip/widget/loading_container.dart';
 
 import 'package:flutter_trip/widget/local_nav.dart';
 import 'package:flutter_trip/widget/sales_box.dart';
@@ -35,58 +37,67 @@ class _HomePageState extends State<HomePage> {
   //销售格子
   SalesBoxModel salesBoxData;
 
-  void loadData() {
-    HomeDao.fetch().then((homeModel) {
+  bool _loading = true;
+
+  //加载首页数据
+  Future<Null> _handleRefresh() async {
+    try {
+      HomeModel model = await HomeDao.fetch();
       setState(() {
-        //轮播图
-        bannerData = homeModel.bannerList;
-        //本地导航
-        localNavData = homeModel.localNavList;
-        //网格导航数据
-        gridNavModel = homeModel.gridNav;
-        //子网格导航数据
-        subNavData = homeModel.subNavList;
-        //销售格子数据
-        salesBoxData = homeModel.salesBox;
+        bannerData = model.bannerList;
+        localNavData = model.localNavList;
+        gridNavModel = model.gridNav;
+        subNavData = model.subNavList;
+        salesBoxData = model.salesBox;
+        _loading = false;
       });
-    });
+    } catch (e) {
+      print(e);
+      setState(() {
+        _loading = false;
+      });
+    }
+    return null;
   }
 
   @override
   void initState() {
     super.initState();
-    loadData();
+    _handleRefresh();
   }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        body: Stack(
-      children: <Widget>[
-        MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: NotificationListener(
-                onNotification: (scrollNotification) {
-                  //第0个元素也就是ListView滚动的时候触发监听
-                  if (scrollNotification is ScrollUpdateNotification &&
-                      scrollNotification.depth == 0) {
-                    _onScroll(scrollNotification.metrics.pixels);
-                  }
-                  return false;
-                },
-                child: ListView(
-                  children: <Widget>[
-                    _createBanner(),
-                    _createLocalNav(),
-                    _createGridNav(),
-                    _createSubNav(),
-                    _createSalesBox(),
-                  ],
-                ))),
-        _createAppBar(),
-      ],
-    ));
+        backgroundColor: Color(0xfff2f2f2),
+        body: LoadingContainer(
+            isLoading: _loading,
+            child: Stack(
+              children: <Widget>[
+                MediaQuery.removePadding(
+                    context: context,
+                    removeTop: true,
+                    child: RefreshIndicator(child: NotificationListener(
+                        onNotification: (scrollNotification) {
+                          //第0个元素也就是ListView滚动的时候触发监听
+                          if (scrollNotification is ScrollUpdateNotification &&
+                              scrollNotification.depth == 0) {
+                            _onScroll(scrollNotification.metrics.pixels);
+                          }
+                          return false;
+                        },
+                        child: ListView(
+                          children: <Widget>[
+                            _createBanner(),
+                            _createLocalNav(),
+                            _createGridNav(),
+                            _createSubNav(),
+                            _createSalesBox(),
+                          ],
+                        )), onRefresh: _handleRefresh)),
+                _createAppBar(),
+              ],
+            )));
   }
 
   ///banner
