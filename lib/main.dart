@@ -16,3 +16,15 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+
+//void main() {
+//  List<String> strList = ["asdasdasdasdasd","啊是大三大四的"];
+//   String text = "";
+//   strList.forEach((value){
+//     text +=value;
+//
+//   });
+//   print(text);
+//}
+
