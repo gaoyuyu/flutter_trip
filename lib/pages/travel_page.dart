@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_trip/dao/travel_tab_dao.dart';
 import 'package:flutter_trip/model/travel_tab_model.dart';
+import 'package:flutter_trip/pages/travel_tab_page.dart';
 
 ///旅拍页面
 class TravelPage extends StatefulWidget {
@@ -73,8 +74,11 @@ class _TravelPageState extends State<TravelPage> with TickerProviderStateMixin {
             child: TabBarView(
                 controller: _controller,
                 children: tabs.map((TravelTab tab) {
-                  return Center(
-                    child: Text("123"),
+                  return TravelTabPage(
+                    travelUrl: travelTabModel.url,
+                    params: travelTabModel.params,
+                    groupChannelCode: tab.groupChannelCode,
+                    type: tab.type,
                   );
                 }).toList()),
           )
